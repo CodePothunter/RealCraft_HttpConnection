@@ -38,7 +38,7 @@ public class HttpUtil {
             switch(msg.what){
                 case POST:
                     res =  (String) msg.obj;
-                    Log.d("Test: ", "PostTest: "+res);break;
+                    Log.d("Test", "PostTest: "+res);break;
                 case GET:
                     res = (String) msg.obj;
                     Log.d("Test", "GetTest: "+res);break;
@@ -77,6 +77,7 @@ public class HttpUtil {
 
     public static String HttpClientGET(String address) {
         final String pass = address;
+        res = "begin";
         new Thread(new Runnable(){
             @Override
             public void run(){
@@ -90,15 +91,21 @@ public class HttpUtil {
                         Message message = new Message();
                         message.what = GET;
                         message.obj = response.toString();
+                        handler.sendMessage(message);
+                        handler.handleMessage(message);
                         res = response;
-                        Log.d("Test", "GET successfully");
+                        Log.d("Test", "GET successfully "+response);
                     }
                 }catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }).start();
-
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return res;
     }
 
@@ -109,7 +116,7 @@ public class HttpUtil {
     public static String HttpClientPOST(String address, List<NameValuePair> params) {
         final String pass = address;
         final List<NameValuePair> param = params;
-
+        res = "begin";
         new Thread() {
             public void run() {
                 try {
@@ -125,14 +132,20 @@ public class HttpUtil {
                         message.what = POST;
                         message.obj = response.toString();
                         handler.sendMessage(message);
-//                        res = response;
-                        Log.d("Test", "POST successfully" + response);
+                        handler.handleMessage(message);
+                        res = response;
+                        Log.d("Test", "POST successfully " + response);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }.start();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return res;
     }
 }

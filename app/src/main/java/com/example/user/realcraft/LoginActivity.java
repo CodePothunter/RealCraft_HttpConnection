@@ -40,15 +40,22 @@ public class LoginActivity extends Activity {
             @Override
             public void onClick(View v){
                 inputTextName = login_name.getText().toString();
-                inputTextPassword = login_password.getText().toString();
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                            inputTextPassword = login_password.getText().toString();
+                            List<NameValuePair> params = new ArrayList<NameValuePair>();
                 params.add(new BasicNameValuePair("username",inputTextName));
-                params.add(new BasicNameValuePair("password",inputTextPassword));
+                params.add(new BasicNameValuePair("password", inputTextPassword));
+                Toast.makeText(LoginActivity.this,R.string.login_wait,Toast.LENGTH_SHORT).show();
                 String response = HttpUtil.HttpClientPOST("http://112.74.98.74/login",params);
                 Log.d("Test",inputTextName);
                 Log.d("Test",inputTextPassword);
-                Log.d("Test","response"+response);
-                Toast.makeText(LoginActivity.this,R.string.login_wait,Toast.LENGTH_SHORT).show();
+                Log.d("Test", "response" + response);
+                if((response.equals("FALSE NOT_VALID"))){
+                    Toast.makeText(LoginActivity.this,R.string.login_fail,Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(LoginActivity.this,R.string.turning,Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }
             }
         });
         button_register.setOnClickListener(new View.OnClickListener() {

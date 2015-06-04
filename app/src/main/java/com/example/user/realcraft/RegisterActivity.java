@@ -1,6 +1,7 @@
 package com.example.user.realcraft;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,12 +22,12 @@ import java.util.List;
 public class RegisterActivity extends Activity {
 
 
-    private  Button button_submit;
+    private Button button_submit;
     private EditText register_email;
     private EditText register_rePassword;
     private EditText register_name ;
     private EditText register_password;
-    private  String inputTextName;
+    private String inputTextName;
     private String inputTextPassword;
     private String inputTextEmail;
     private String inputTextRePassword;
@@ -47,17 +48,24 @@ public class RegisterActivity extends Activity {
                 inputTextEmail = register_email.getText().toString();
                 inputTextRePassword = register_rePassword.getText().toString();
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("username",inputTextName));
-                params.add(new BasicNameValuePair("password",inputTextPassword));
+                params.add(new BasicNameValuePair("username", inputTextName));
+                params.add(new BasicNameValuePair("password", inputTextPassword));
                 params.add(new BasicNameValuePair("passconf",inputTextRePassword));
-                params.add(new BasicNameValuePair("email",inputTextEmail));
+                params.add(new BasicNameValuePair("email", inputTextEmail));
                 String response = HttpUtil.HttpClientPOST("http://112.74.98.74/account/register",params);
-                Log.d("Test",inputTextName);
+                Toast.makeText(RegisterActivity.this,R.string.register_wait,Toast.LENGTH_SHORT).show();
+                Log.d("Test", inputTextName);
                 Log.d("Test",inputTextPassword);
                 Log.d("Test",inputTextEmail);
                 Log.d("Test",inputTextRePassword);
-                Log.d("Test","response"+response);
-                Toast.makeText(RegisterActivity.this,R.string.register_wait,Toast.LENGTH_SHORT).show();
+                Log.d("Test", "response" + response);
+                if(response.equals("FALSE NOT_VALID")){
+                    Toast.makeText(RegisterActivity.this,R.string.login_fail,Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(RegisterActivity.this,R.string.turning,Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }
             }
         });
     }
