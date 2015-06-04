@@ -4,6 +4,8 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.util.Pair;
+import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -27,6 +29,8 @@ import java.util.List;
  * Created by user on 2015/6/2.
  */
 public class HttpUtil {
+    public static final int SHOW_RESPONSE = 0;
+    public static String res;
 
     public static String sendHttpRequest(String address) {
         HttpURLConnection connection = null;
@@ -57,22 +61,30 @@ public class HttpUtil {
         }
     }
 
-    public static String HttpClientGET(String address) {
+    private static String HttpClientGET(String address) {
         final String pass = address;
-        String res = null;
-        try {
-            HttpClient httpClient = new DefaultHttpClient();
-            HttpGet httpGet = new HttpGet(pass);
-            HttpResponse httpResponse = httpClient.execute(httpGet);
-            if (httpResponse.getStatusLine().getStatusCode() == 200) {
-                HttpEntity entity = httpResponse.getEntity();
-                String response = EntityUtils.toString(entity, "utf-8");
-                res = response;
-                Log.d("Test", "GET successfully");
+        new Thread(new Runnable(){
+            @Override
+            public void run(){
+                try {
+                    HttpClient httpClient = new DefaultHttpClient();
+                    HttpGet httpGet = new HttpGet(pass);
+                    HttpResponse httpResponse = httpClient.execute(httpGet);
+                    if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                        HttpEntity entity = httpResponse.getEntity();
+                        String response = EntityUtils.toString(entity, "utf-8");
+                        Message message = new Message();
+                        message.what = SHOW_RESPONSE;
+                        message.obj = response.toString();
+                        res = response;
+                        Log.d("Test", "GET successfully");
+                    }
+                }catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        }catch (IOException e) {
-            e.printStackTrace();
-        }
+        }).start();
+
         return res;
     }
 
@@ -80,21 +92,9 @@ public class HttpUtil {
 //        return response;
 //    }
 
-    public static String HttpClientPOST(String address, List<NameValuePair> params) {
+    private static String HttpClientPOST(String address, List<NameValuePair> params) {
         final String pass = address;
         final List<NameValuePair> param = params;
-        String res = null;
-        final int SHOW_RESPONSE = 0;
-
-        final Handler handler = new Handler() {
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
-                    case SHOW_RESPONSE:
-                        String response = ((String) msg.obj);
-                        Log.d("TEST", "lalala" + response);
-                }
-            }
-        };
         new Thread() {
             public void run() {
                 try {
@@ -109,8 +109,8 @@ public class HttpUtil {
                         Message message = new Message();
                         message.what = SHOW_RESPONSE;
                         message.obj = response.toString();
-                        handler.sendMessage(message);
-                        Log.d("Test", "GET successfully"+response);
+//                        res = response;
+                        Log.d("Test", "POST successfully" + response);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
