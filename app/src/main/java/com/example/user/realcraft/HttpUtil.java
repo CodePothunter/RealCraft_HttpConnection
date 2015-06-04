@@ -29,8 +29,22 @@ import java.util.List;
  * Created by user on 2015/6/2.
  */
 public class HttpUtil {
-    public static final int SHOW_RESPONSE = 0;
+    public static final int POST = 0;
+    public static final int GET = 1;
     public static String res;
+
+    public static Handler handler = new Handler(){
+        public void handleMessage(Message msg){
+            switch(msg.what){
+                case POST:
+                    res =  (String) msg.obj;
+                    Log.d("Test: ", "PostTest: "+res);break;
+                case GET:
+                    res = (String) msg.obj;
+                    Log.d("Test", "GetTest: "+res);break;
+            }
+        }
+    };
 
     public static String sendHttpRequest(String address) {
         HttpURLConnection connection = null;
@@ -61,7 +75,7 @@ public class HttpUtil {
         }
     }
 
-    private static String HttpClientGET(String address) {
+    public static String HttpClientGET(String address) {
         final String pass = address;
         new Thread(new Runnable(){
             @Override
@@ -74,7 +88,7 @@ public class HttpUtil {
                         HttpEntity entity = httpResponse.getEntity();
                         String response = EntityUtils.toString(entity, "utf-8");
                         Message message = new Message();
-                        message.what = SHOW_RESPONSE;
+                        message.what = GET;
                         message.obj = response.toString();
                         res = response;
                         Log.d("Test", "GET successfully");
@@ -92,9 +106,10 @@ public class HttpUtil {
 //        return response;
 //    }
 
-    private static String HttpClientPOST(String address, List<NameValuePair> params) {
+    public static String HttpClientPOST(String address, List<NameValuePair> params) {
         final String pass = address;
         final List<NameValuePair> param = params;
+
         new Thread() {
             public void run() {
                 try {
@@ -107,8 +122,9 @@ public class HttpUtil {
                         HttpEntity entityGet = httpResponse.getEntity();
                         String response = EntityUtils.toString(entityGet, "utf-8");
                         Message message = new Message();
-                        message.what = SHOW_RESPONSE;
+                        message.what = POST;
                         message.obj = response.toString();
+                        handler.sendMessage(message);
 //                        res = response;
                         Log.d("Test", "POST successfully" + response);
                     }
