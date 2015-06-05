@@ -192,4 +192,43 @@ public class UpdateInfo {
             e.printStackTrace();
         }
     }
+
+    public void updateItermInfo(int id, int type){
+        String Id = Integer.toString(id);
+        String Type = Integer.toString(type);
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("targetId", Id));
+        params.add(new BasicNameValuePair("targetType", Type));
+        String response = HttpUtil.HttpClientPOST("http://112.74.98.74/request/detail",params);
+        int wood = 0, stone = 0, food = 0;
+        int curValue = 0, maxDurability = 0;
+        String location = null;
+        if(type == 1){
+            try{
+                JSONArray jsonArray = new JSONArray(response);
+                for(int i = 0; i < jsonArray.length(); ++i) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    location = jsonObject.getString("location");
+                    wood = Integer.parseInt(jsonObject.getString("wood"));
+                    stone = Integer.parseInt(jsonObject.getString("stone"));
+                    food = Integer.parseInt(jsonObject.getString("food"));
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }else if(type == 2){
+            try{
+                JSONArray jsonArray = new JSONArray(response);
+                for(int i = 0; i < jsonArray.length(); ++i) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    location = jsonObject.getString("location");
+                    curValue = Integer.parseInt(jsonObject.getString("value"));
+                    maxDurability = Integer.parseInt(jsonObject.getString("maxdurability"));
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
