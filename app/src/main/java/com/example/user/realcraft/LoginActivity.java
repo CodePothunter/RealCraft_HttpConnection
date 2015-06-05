@@ -45,16 +45,16 @@ public class LoginActivity extends Activity {
                 params.add(new BasicNameValuePair("username",inputTextName));
                 params.add(new BasicNameValuePair("password", inputTextPassword));
                 Toast.makeText(LoginActivity.this,R.string.login_wait,Toast.LENGTH_SHORT).show();
-                String response = HttpUtil.HttpClientPOST("http://112.74.98.74/login",params);
+                String response = HttpUtil.HttpClientPOST("http://112.74.98.74/account/login",params);
                 Log.d("Test",inputTextName);
                 Log.d("Test",inputTextPassword);
                 Log.d("Test", "response" + response);
-                if((response.equals("FALSE NOT_VALID"))){
-                    Toast.makeText(LoginActivity.this,R.string.login_fail,Toast.LENGTH_SHORT).show();
-                }else{
+                if((response.equals("1"))){
                     Toast.makeText(LoginActivity.this,R.string.turning,Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
+                }else{
+                    Toast.makeText(LoginActivity.this,R.string.login_fail,Toast.LENGTH_SHORT).show();
                 }
             }
         });

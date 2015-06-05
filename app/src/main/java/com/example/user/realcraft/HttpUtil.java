@@ -10,10 +10,12 @@ import android.widget.Toast;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
@@ -32,6 +34,7 @@ public class HttpUtil {
     public static final int POST = 0;
     public static final int GET = 1;
     public static String res;
+    public static String SESSIONID = null;
 
     public static Handler handler = new Handler(){
         public void handleMessage(Message msg){
@@ -82,12 +85,26 @@ public class HttpUtil {
             @Override
             public void run(){
                 try {
-                    HttpClient httpClient = new DefaultHttpClient();
+                    DefaultHttpClient httpClient = new DefaultHttpClient();
                     HttpGet httpGet = new HttpGet(pass);
+                    if(SESSIONID != null){
+                        httpGet.setHeader("Cookie","ci_session="+SESSIONID);
+                    }
                     HttpResponse httpResponse = httpClient.execute(httpGet);
                     if (httpResponse.getStatusLine().getStatusCode() == 200) {
                         HttpEntity entity = httpResponse.getEntity();
                         String response = EntityUtils.toString(entity, "utf-8");
+                        CookieStore mCookieStore = httpClient.getCookieStore();
+                        List<Cookie> cookies = mCookieStore.getCookies();
+                        Log.d("Test","cookies siez"+Integer.toString(cookies.size()));
+                        for(int i = 0; i < cookies.size(); ++i){
+                            Log.d("Test",cookies.get(i).getName());
+                            if("ci_session".equals(cookies.get(i).getName())){
+                                SESSIONID = cookies.get(i).getValue();
+                                break;
+                            }
+                        }
+                        Log.d("Test","PHPSWSSID: "+SESSIONID);
                         Message message = new Message();
                         message.what = GET;
                         message.obj = response.toString();
@@ -102,10 +119,11 @@ public class HttpUtil {
             }
         }).start();
         try {
-            Thread.sleep(200);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        Log.d("Test", "GET successfully "+res);
         return res;
     }
 
@@ -120,14 +138,28 @@ public class HttpUtil {
         new Thread() {
             public void run() {
                 try {
-                    HttpClient httpClient = new DefaultHttpClient();
+                    DefaultHttpClient httpClient = new DefaultHttpClient();
                     HttpPost httpPost = new HttpPost(pass);
                     UrlEncodedFormEntity entity = new UrlEncodedFormEntity(param, "utf-8");
                     httpPost.setEntity(entity);
+                    if(SESSIONID != null){
+                        httpPost.setHeader("Cookie","ci_session="+SESSIONID);
+                    }
                     HttpResponse httpResponse = httpClient.execute(httpPost);
                     if (httpResponse.getStatusLine().getStatusCode() == 200) {
                         HttpEntity entityGet = httpResponse.getEntity();
                         String response = EntityUtils.toString(entityGet, "utf-8");
+                        CookieStore mCookieStore = httpClient.getCookieStore();
+                        List<Cookie> cookies = mCookieStore.getCookies();
+                        Log.d("Test","cookies siez"+Integer.toString(cookies.size()));
+                        for(int i = 0; i < cookies.size(); ++i){
+                            Log.d("Test",cookies.get(i).getName());
+                            if("ci_session".equals(cookies.get(i).getName())){
+                                SESSIONID = cookies.get(i).getValue();
+                                break;
+                            }
+                        }
+                        Log.d("Test","PHPSWSSID: "+SESSIONID);
                         Message message = new Message();
                         message.what = POST;
                         message.obj = response.toString();
